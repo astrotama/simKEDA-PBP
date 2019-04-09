@@ -1,0 +1,6 @@
+; $Id$
+name = "Setor Module Keluar"
+description = "Penatausahaan - Setor KEluar"
+;dependencies[] = 
+core = 7.x
+package="simKEDA"

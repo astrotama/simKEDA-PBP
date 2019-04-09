@@ -1,0 +1,193 @@
+<?php
+function setorkeluarsubmit_main($arg=NULL, $nama=NULL) {
+	//drupal_add_css('files/css/textfield.css');
+	
+	$koderod = arg(1);	
+	if(arg(3)=='pdf'){		
+		/*$url = url(current_path(), array('absolute' => TRUE));		
+		$url = str_replace('/pdf', '', $url);
+		
+		$output = printspm($kodekeg);
+		apbd_ExportSPM($output, 'SPM', $url);*/
+	
+	} else {
+	
+		//$btn = l('Cetak', '');
+		//$btn .= "&nbsp;" . l('Excel', '' , array ('html' => true, 'attributes'=> array ('class'=>'btn btn-primary')));
+		
+		//$output = theme('table', array('header' => $header, 'rows' => $rows ));
+		//$output .= theme('table', array('header' => $header, 'rows' => $rows ));
+		//$output .= theme('pager');
+		$output_form = drupal_get_form('setorkeluarsubmit_main_form');
+		return drupal_render($output_form);// . $output;
+	}		
+	
+}
+
+function setorkeluarsubmit_main_form($form, &$form_state) {
+	$kodero = arg(1);
+	$dataset=explode(',',$_SESSION[$GLOBALS['user']->uid.'keluar'.$kodero]);
+
+	//drupal_set_message($kodero);
+	$result=db_query("select distinct s.koderod,s.kodero, (select sum(s.jumlahmasuk) from setor as s where s.setorid in(:setorid)) as jumlahkeluar from setor as s  where s.kodero=:kodero",array(':setorid'=>$dataset, ':kodero'=>$kodero));
+	//drupal_set_message($_SESSION[$GLOBALS['user']->uid.'keluar'.$kodero]);
+	foreach($result as $data){
+		$kodero=$data->kodero;
+		$koderod=$data->koderod;
+		$namasubrek='';//$data->uraian;
+		$jumlah=$data->jumlahkeluar;
+	}
+	$result=db_query("select  s.uraian, s.kodeuk, s.tanggal from setor as s where s.setorid in(:setorid) and s.kodero=:kodero",array(':setorid'=>$dataset, ':kodero'=>$kodero));
+	//drupal_set_message($_SESSION[$GLOBALS['user']->uid.'keluar'.$kodero]);
+	$datauraian='';
+	foreach($result as $data){
+		$tanggal = strtotime($data->tanggal);
+		$kodeuk = $data->kodeuk;
+		$datauraian.=$data->uraian;
+		$datauraian.=' ,';
+	}
+	//drupal_set_message($kodeuk);
+	$result=db_query("select uraian from rincianobyek where kodero=:kodero",array(':kodero'=>$kodero));
+	foreach($result as $data){
+		$namarek=$data->uraian;
+	}
+	$form['formdokumen']['kodeuk']= array(
+		'#type' => 'value',
+		'#value' => $kodeuk,
+	);	
+	$form['formdokumen']['kodero']= array(
+		'#type' => 'value',
+		'#value' => $kodero,
+	);	
+	$form['formdokumen']['e_koderod']= array(
+		'#type' => 'value',
+		'#value' => $koderod,
+	);	
+	$form['koderod'] = array(
+		'#type' => 'textfield',
+		'#title' =>  t('Kode rekening detil'),
+		'#default_value' => $koderod,
+		'#disabled' =>true,
+		
+	);
+	$form['uraian'] = array(
+		'#type' => 'textfield',
+		'#title' =>  t('Uraian'),
+		'#maxlength' => 1024,
+		'#default_value' => $datauraian,
+	);
+	$form['keterangan'] = array(
+		'#type' => 'textfield',
+		'#title' =>  t('Keterangan'),
+		'#default_value' => 'Setoran',
+	);
+	$form['setorid']= array(
+		'#type' => 'value',
+		'#value' => $_SESSION[$GLOBALS['user']->uid.'keluar'.$kodero],
+	);	
+	//$tgl= mktime(0,0,0,date('m'),date('d'),2019);
+	$form['tanggal'] = array(
+		'#type' => 'date',
+		'#title' =>  t('Tanggal'),
+		// The entire enclosing div created here gets replaced when dropdown_first
+		// is changed.
+		//'#disabled' => true,
+		//'#default_value' => $tanggal,
+		'#default_value'=> array(
+			'year' => format_date($tanggal, 'custom', 'Y'),
+			'month' => format_date($tanggal, 'custom', 'n'), 
+			'day' => format_date($tanggal, 'custom', 'j'), 
+		  ), 
+		
+	);
+	$java='<script type="text/javascript">
+				
+				$("input#edit-jumlah").focus(function(){
+					var rp=$( this ).val();
+					$( this ).val(rp.split(".").join(""));
+					
+					});
+				$("[id^=edit-jumlah]").blur(function(){
+					var rp=$( this ).val();
+					temp=rp;
+					if(rp>0){
+						$( this ).val(toRp(rp));
+					}
+					else{
+						$( this ).val("Kosong");
+					}
+					
+				})
+				function toRp(angka){
+					var rev     = parseInt(angka, 10).toString().split("").reverse().join("");
+					var rev2    = "";
+					for(var i = 0; i < rev.length; i++){
+						rev2  += rev[i];
+						if((i + 1) % 3 === 0 && i !== (rev.length - 1)){
+							rev2 += ".";
+						}
+					}
+					return rev2.split("").reverse().join("");
+				}	
+	</script>';
+	$form['jumlah'] = array(
+		'#type' => 'textfield',
+		'#title' =>  t('Jumlah'),
+		//'#disabled' =>true,
+		'#default_value' => $jumlah,
+		'#attached'=>array(
+							'js'=>array(
+									//drupal_get_path('module', 'akuntansi') . '/akuntansi.js',
+									drupal_get_path('module', 'akuntansi') . '/jquery-1.10.2.js',
+									
+							)
+					),
+		'#suffix' => $java,
+	);
+	
+	$form['formdata']['submit']= array(
+		'#type' => 'submit',
+		'#value' => '<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Simpan',
+		'#attributes' => array('class' => array('btn btn-sm btn-success pull-right')),
+	);
+		$form['formdata']['mark'] = array(
+		'#markup' =>'<a class="btn btn-sm btn-danger" href="/setorarsipkeluar">Tutup</a>',
+		//'#suffix' =>,
+	);
+	return $form;
+}
+
+function setorkeluarsubmit_main_form_validate($form, &$form_state) {
+	//$sppno = $form_state['values']['sppno'];
+	$uraian = $form_state['values']['uraian'];
+	$jumlahkeluar = $form_state['values']['jumlah'];
+	if ($uraian=='') form_set_error('uraian', 'Uraian harap diisi');	
+	if ($jumlahkeluar=='') form_set_error('jumlah', 'Jumlah harap diisi');	
+}
+	
+function setorkeluarsubmit_main_form_submit($form, &$form_state) {
+	$kodeuk = $form_state['values']['kodeuk'];
+	$tanggal = $form_state['values']['tanggal'];
+	$tgl_keluar = $tanggal['year'] . '-' . $tanggal['month'] . '-' . $tanggal['day'];
+
+	$setorid = $form_state['values']['setorid'];
+	$keterangan = $form_state['values']['keterangan'];
+	$dataset=explode(',',$setorid);
+	
+	//drupal_set_message($kodeuk);
+	//drupal_set_message($tgl_keluar);
+	$idkeluar = apbd_setorkeluarid($keterangan, $kodeuk, $tgl_keluar);
+	
+	foreach($dataset as $id){
+		$result=db_query("UPDATE setor SET idkeluar=:idkeluar, jumlahkeluar=jumlahmasuk, tgl_keluar=:tgl_keluar where setorid=:setorid", array(':idkeluar'=>$idkeluar, ':tgl_keluar'=>$tgl_keluar, ':setorid'=>$id));
+	}	
+	
+	
+	
+    drupal_goto('setorkeluar');
+
+}
+
+
+
+?>

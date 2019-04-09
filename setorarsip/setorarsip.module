@@ -1,0 +1,140 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function setorarsip_perm() {
+    return array(
+        'access penata content',
+		'access laporan penata'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function setorarsip_menu() {
+	
+	$items['editsetorkeluar'] = array (
+      'title' => 'Edit Setor Keluar',
+	  'description' => 'Edit Setor Keluar',
+      'page callback' => 'setorkeluar_edit_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'setorkeluar_edit_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['setorarsip'] = array (
+      'title' => 'Arsip Penerimaan',
+	  'description' => 'Daftar Setor',
+	  //'title callback' => 'setorarsiparsip_title_callback',	  
+      'page callback' => 'setorarsip_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'setorarsip_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['cetakbku'] = array (
+      'title' => 'Daftar Arsip Setor',
+	  'description' => 'Daftar Setor',
+	  //'title callback' => 'setorarsiparsip_title_callback',	  
+      'page callback' => 'cetakbku_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'cetakbku_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['cetakrekap'] = array (
+      'title' => 'Daftar Arsip Setor',
+	  'description' => 'Daftar Setor',
+	  //'title callback' => 'setorarsiparsip_title_callback',	  
+      'page callback' => 'cetakrekap_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'cetakrekap_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['cetakba'] = array (
+      'title' => 'Daftar Arsip Setor',
+	  'description' => 'Daftar Setor',
+	  //'title callback' => 'setorarsiparsip_title_callback',	  
+      'page callback' => 'cetakberitaacara_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'cetakberitaacara_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['cetakpen'] = array (
+      'title' => 'Daftar Arsip Setor',
+	  'description' => 'Daftar Setor',
+	  //'title callback' => 'setorarsiparsip_title_callback',	  
+      'page callback' => 'cetakpen_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'cetakpen_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['setorarsipkeluar'] = array (
+      'title' => 'Arsip Penyetoran',
+	  'description' => 'Daftar Setor Keluar',
+	  //'title callback' => 'setorarsiparsip_title_callback',	  
+      'page callback' => 'setorarsipkeluar_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'setorarsipkeluar_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['cetakjenis'] = array (
+      'title' => 'Daftar Arsip Setor',
+	  'description' => 'Daftar Setor',
+	  'title callback' => 'setorarsiparsip_title_callback',	  
+      'page callback' => 'cetakjenis_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'cetakjenis_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['setoredit'] = array (
+      'title' => 'Daftar Arsip Setor Keluar',
+	  'description' => 'Daftar Setor Keluar',
+	  'title callback' => 'setorarsiparsip_title_callback',	  
+      'page callback' => 'setor_edit_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'setor_edit_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+    	
+
+	
+    return $items;
+}
+
+
+function setorarsipantrian_title_callback() {
+    return t('Antrian SPM Gaji');
+}
+
+function setorarsip_title_callback() {
+	return t('Arsip Setoran');
+}
+
+function setorarsiparsip_title_callback() {
+    return t('Arsip Setoran');
+}
+

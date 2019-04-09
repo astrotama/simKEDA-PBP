@@ -1,0 +1,6 @@
+; $Id$
+name = "Import Excel"
+description = "Import Excel"
+;dependencies[] = 
+core = 7.x
+package="APBD R1"
